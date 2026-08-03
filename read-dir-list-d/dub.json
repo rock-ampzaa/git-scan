@@ -1,0 +1,11 @@
+{
+  "description": "读取目录列表文件",
+  "authors": [
+    "rock"
+  ],
+  "license": "proprietary",
+  "name": "read-dir-list",
+  "sourcePaths": [
+    "src"
+  ]
+}
