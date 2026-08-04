@@ -1,6 +1,6 @@
 # scan-git
 ## NAME
-scan-git - 扫描指定的路径，检查该目录是否干净.
+scan-git - 扫描指定的路径，检查该git目录是否干净.
 ## SYNOPSIS
 scan-git <路径>
 ## DESCRIPTION
@@ -12,3 +12,11 @@ scan-git <路径>
 ```
 read-dir-lists -f <目录列表文件> | xargs -I[] scan-git []
 ```
+## 构建方式
+需要 `libgit2`库(开发时使用版本为1.9.0). 以c3c构建. 在scan-git-c3目录中执行
+```
+c3c build
+```
+然后生成的可执行文件在 `build/`中
+
+*ps*: 引入`string`库只为输出时对齐位置，可以自行实现`string_wide`函数, 就不用引入string库了
