@@ -50,8 +50,6 @@ fn int main(String[] args)
 		return 1;
 	}
 	ZString path = args[1].zstr_copy(tmem);
-	//io::printfn("==========================================================================================================================================\n将要打开仓库: %s",
-	//   path);
 
 	git::init();
 	defer git::shutdown();
@@ -137,57 +135,41 @@ fn void chk_status_change(Repo* repo, Report* rpt)
 		Entry* entry = status::byindex(list, i);
 		if (entry.status & status::Type.GIT_STATUS_WT_DELETED) {
 			//该文件从worktree中删除了
-			//io::print(pad_right("删除了文件", 80));
-			//io::printn(string::tformat("[%s]", entry.index_to_workdir.old_file.path));
 
 			rpt.push_message(string::format(mem, "%s[%s]", pad_right("删除了文件", 80), entry.index_to_workdir.old_file.path));
 		}
 		if (entry.status & status::Type.GIT_STATUS_INDEX_DELETED) {
 			//该文件从index中删除了
-			//io::print(pad_right("删除了文件", 80));
-			//io::printn(string::tformat("[%s]", entry.head_to_index.old_file.path));
 
 			rpt.push_message(string::format(mem, "%s[%s]", pad_right("删除了文件", 80), entry.head_to_index.old_file.path));
 		}
 		else if (entry.status & status::Type.GIT_STATUS_WT_NEW) {
 			//新建文件
-			//io::print(pad_right("新增未管理文件:", 80));
-			//io::printn(string::tformat("[%s]", entry.index_to_workdir.old_file.path));
 
 			rpt.push_message(string::format(mem, "%s[%s]", pad_right("新建了文件", 80), entry.index_to_workdir.old_file.path));
 		}
 		else if (entry.status & status::Type.GIT_STATUS_INDEX_NEW) {
 			//新建文件
-			//io::print(pad_right("暂存了文件:", 80));
-			//io::printn(string::tformat("[%s]", entry.head_to_index.old_file.path));
 
 			rpt.push_message(string::format(mem, "%s[%s]", pad_right("暂存了文件", 80), entry.head_to_index.old_file.path));
 		}
 		else if (entry.status & status::Type.GIT_STATUS_WT_RENAMED) {
 			// 改名
-			//io::print(pad_right("改名了文件:", 80));
-			//io::printn(string::tformat("[%s] -> [%s]", entry.index_to_workdir.old_file.path, entry.index_to_workdir.new_file.path));
 
 			rpt.push_message(string::format(mem, "%s[%s] -> [%s]", pad_right("改名了文件", 80), entry.index_to_workdir.old_file.path, entry.index_to_workdir.new_file.path));
 		}
 		else if (entry.status & status::Type.GIT_STATUS_INDEX_RENAMED) {
 			// 改名
-			//io::print(pad_right("改名了文件:", 80));
-			//io::printn(string::tformat("[%s] -> [%s]", entry.head_to_index.old_file.path, entry.head_to_index.new_file.path));
 
 			rpt.push_message(string::format(mem, "%s[%s] -> [%s]", pad_right("改名了文件", 80), entry.head_to_index.old_file.path, entry.head_to_index.new_file.path));
 		}
 		else if (entry.status & GIT_STATUS_WT_MODIFIED) {
 			// 修改过
-			//io::print(pad_right("修改了文件:", 80));
-			//io::printn(string::tformat("[%s]", entry.index_to_workdir.old_file.path));
 
 			rpt.push_message(string::format(mem, "%s[%s]", pad_right("修改了文件", 80), entry.index_to_workdir.old_file.path));
 		}
 		else if (entry.status & GIT_STATUS_INDEX_MODIFIED) {
 			// 修改过
-			//io::print(pad_right("修改了文件:", 80));
-			//io::printn(string::tformat("[%s]", entry.head_to_index.old_file.path));
 
 			rpt.push_message(string::format(mem, "%s[%s]", pad_right("修改了文件", 80), entry.head_to_index.old_file.path));
 		}
@@ -217,7 +199,6 @@ fn void chk_branch(BranchIterator* bi, Report* rpt)
 
 
 			git::branch_name(&name1, upstream);
-			//io::printf("upstream name: %s ", pad_right(name.str_view(), 30));
 			// 获取upstream oid, b oid
 			git::Object* this_obj, upstream_obj;
 			git::Oid* this_oid, upstream_oid;
@@ -228,8 +209,6 @@ fn void chk_branch(BranchIterator* bi, Report* rpt)
 				upstream_oid = git::object_id(upstream_obj);
 			}
 			if ((this_oid && upstream_oid) && 0 != git::oid_cmp(this_oid, upstream_oid)) {
-				//io::print(pad_right(string::tformat("分支: %s",name.str_view()), 80));
-				//io::printfn("与上游[%s]不相同", name1.str_view());
 				rpt.push_message(string::format(mem, "%s与上游[%s]不同", pad_right(string::tformat("分支: %s",name.str_view()), 80), name1.str_view()));
 			}
 			else {
@@ -239,13 +218,10 @@ fn void chk_branch(BranchIterator* bi, Report* rpt)
 			if(upstream_obj) git::object_free(upstream_obj);
 			if (upstream) git::branch_free(upstream);
 		}
-		//io::eprintn("free branch [b]variable");
 		defer git::branch_free(b);
 	}
 	// 如果所有分支都没有上游分支，则要提示问题
 	if (!has_upstream) {
-		//io::print(pad_right("全局", 80));
-		//io::printn("必须至少一个上游分支");
 		rpt.push_message(string::format(mem, "%s%s", pad_right("全局", 80), "必须至少一个上游分支"));
 	}
 }
