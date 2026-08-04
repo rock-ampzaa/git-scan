@@ -5,6 +5,7 @@ import core.stdc.stdlib : EXIT_SUCCESS, EXIT_FAILURE;
 import std.process;
 import std.range, std.string;
 import std.algorithm.sorting;
+import std.algorithm;
 
 /// 状态码
 enum ERROR_CODE : int {
@@ -149,11 +150,8 @@ string[] get_subdir(string path)
 		return [];
 	}
 	// 获取其下的子目录
-	auto subdirs = dirEntries(path, "*", SpanMode.shallow).filter!(f => f.isDir);
-	string[] result;
-	foreach (dir; subdirs)
-		result ~= dir;
-	return result;
+	auto subdirs = dirEntries(path, "*", SpanMode.shallow).filter!(f => f.isDir && !f.name.endsWith("/.git"));
+	return subdirs.map!(a => a.name).array();
 }
 
 /** 处理 目录列表文件内容
