@@ -20,7 +20,6 @@ enum ERROR_CODE : int {
 */
 int main(string[] args)
 {
-	//writefln("------------- %s -------------", "getopt");
 	string[] dir_params, git_dir;
 	string from_file, prog_name;
 	bool verbose = false;
@@ -38,51 +37,21 @@ int main(string[] args)
 		defaultGetoptPrinter("测试用", opt.options);
 
 	if (ver)
-		writeln("version 0.1.1");
+		writeln("version 1.0.0");
 	if (verbose)
 		writeln("verbose on");
-	//      if (from_file)
-	//      	writeln("list file: ", from_file);
-	//      if (dir_params)
-	//      	foreach (dir; dir_params)
-	//      		writeln("dir: ", dir);
 
-	//      writeln("--------------------------");
-	//      auto files = dirEntries(".", "*.txt", SpanMode.depth);
-	//      foreach (f; files) {
-	//      	writefln("file: %s. isExists: %s. isDir: %s. isFile: %s", f.name, f.exists, f.isDir, f.isFile);
-	//      }
+	prog_name = args[0].baseName();
+	if (prog_name == "scan-need-git-op") {
+		from_file ~= environment.get("HOME") ~ "/git-scan-dirs";
+	}
 
-	//      writeln("-----------筛选出来的目录---------------");
-	//      /// dirs = 筛选出来的目录
-	//      auto dirs = dirEntries(".", "*", SpanMode.shallow).filter!(f => f.isDir);
-	//      foreach (f; dirs) {
-	//      	writefln("directory: %s. isExists: %s. isDir: %s. isFile: %s", f.name, f.exists, f.isDir, f.isFile);
-	//      }
-
-	//writeln("------------读取当前程序名称--------------");
-	//      writeln("当前名称: ", args[0]);
-	//      writeln("当前短名称: ", baseName(args[0]));
-	//      prog_name = args[0].baseName();
-	//      writeln("当前短名称: ", prog_name);
-
-	//writeln("-------------处理命令行参数中的 dir -------------");
 	foreach (dir; dir_params) {
 		// 判断目录列表文件是否存在
 		if (chk_dir_exists(dir))
 			git_dir ~= expand_path(dir);
 	}
-	//writeln("-------------读取目录列表文件-------------");
-	// 判断目录列表文件是否存在
-	// 如果指定了目录列表文件，则 读取 目录列表文件
-	// 检查该文件是否存在
-	// 	不存在：报错
-	// 展开 home目录
-	// - 检验 每个目录是否都存在
-	// 	- 去掉 `/*`之后的目录要检验. 确保父目录存在
-	// 展开`/*`字符, 获取子目录
-	// 去掉 exclude 
-	//
+
 	if (from_file) {
 		// 读取目录列表文件
 		if (!exists(from_file)) {
@@ -95,16 +64,10 @@ int main(string[] args)
 		proc_list_file(dirs_file, git_dir);
 	}
 
-	//	writeln("\n----------检查目录列表是否为空----------------");
-	// 是否指定目录列表文件
-	//	否. 使用当前目录
-	// 	是. 使用 指定目录列表文件
 	if (!git_dir) {
 		//writeln("当前目录: ", getcwd);
 		git_dir ~= getcwd;
 	}
-	//      // TODO:测试代码 
-	//writeln("当前git_dir内容");
 	foreach (line; git_dir)
 		writeln(line);
 
