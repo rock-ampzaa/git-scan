@@ -1,2 +1,3 @@
 read-dir-list
 scan-need-git-op
+*.o
