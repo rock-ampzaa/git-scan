@@ -1,3 +1,4 @@
 git-scan-dirs
 scripts
 *.o
+build

@@ -11,5 +11,5 @@ fn int main(String[] argv)
 		io::eprintn("必须有一个参数");
 		return 1;
 	}
-	return proc::proc(argv[1]);
+	return proc::proc(argv[1].zstr_copy(mem));
 }

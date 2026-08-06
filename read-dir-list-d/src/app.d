@@ -6,7 +6,9 @@ import std.process;
 import std.range, std.string;
 import std.algorithm.sorting;
 import std.algorithm;
+import std.string;
 
+extern (C) int proc__proc(const(char)* path);
 /// 状态码
 enum ERROR_CODE : int {
 	PARAMETER_INVALID = 0x10,
@@ -37,7 +39,7 @@ int main(string[] args)
 		defaultGetoptPrinter("测试用", opt.options);
 
 	if (ver)
-		writeln("version 1.0.0");
+		writeln("version 2.0.0");
 	if (verbose)
 		writeln("verbose on");
 
@@ -68,9 +70,10 @@ int main(string[] args)
 		//writeln("当前目录: ", getcwd);
 		git_dir ~= getcwd;
 	}
-	foreach (line; git_dir)
-		writeln(line);
-
+	foreach (line; git_dir) {
+		// 这里循环调用c3函数
+		proc__proc(toStringz(line));
+	}
 	return EXIT_SUCCESS;
 }
 /** 扩展路径

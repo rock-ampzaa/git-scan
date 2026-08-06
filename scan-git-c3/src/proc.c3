@@ -185,9 +185,9 @@ fn String pad_left(String str, uint len)
 	return result;
 }
 
-fn int proc(String path_)
+fn int proc(ZString path) @export
 {
-	ZString path = path_.zstr_copy(tmem);
+	//ZString path = path_.zstr_copy(tmem);
 
 	git::init();
 	defer git::shutdown();
