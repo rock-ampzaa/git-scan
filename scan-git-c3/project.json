@@ -7,11 +7,11 @@
   "dependency-search-paths": [ "lib" ],
   // Libraries to use for all targets.
   "dependencies": [ ],
-  "linked-libraries": ["git2", "string","icudata","icuuc"],
+  "linked-libraries": ["git2", "rock-soo","icudata","icuuc"],
   // Authors, optionally with email.
-  "authors": [ "John Doe <john.doe@example.com>" ],
+  "authors": [ "rock, shenjun <rock_shenjun@163.com>" ],
   // Version using semantic versioning.
-  "version": "0.1.0",
+  "version": "2.0.0",
   // Sources compiled for all targets.
   "sources": [ "src/**" ],
   // Test sources compiled for all targets.
@@ -39,8 +39,8 @@
   },
   // Global settings.
   // CPU name, used for optimizations in the LLVM backend.
-  "cpu": "generic",
+  "cpu": "native",
   // Optimization: "O0", "O1", "O2", "O3", "O4", "O5", "Os", "Oz".
-  "opt": "O0"
+  "opt": "O2"
   // See resources/examples/project_all_settings.json and 'c3c --list-project-properties' to see more properties.
 }

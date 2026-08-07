@@ -1,4 +1,4 @@
-PREFIX      ?=
+PREFIX      ?=/local
 DESTDIR     ?=
 EXEC_PREFIX ?= $(PREFIX)
 BINDIR      ?= $(EXEC_PREFIX)/bin
@@ -13,7 +13,7 @@ C3_FLAGS     := -O2 --no-entry
 
 LINKER       := $(DC)  # 使用 D 链接器
 LINK_FLAGS   := -O2 -release
-LINK_LIBS    := -L-lgit2 -L-lstring -L-licuuc # 链接 C3 运行时需要的库
+LINK_LIBS    := -L-lgit2 -L-lrock-soo -L-licuuc # 链接 C3 运行时需要的库
 
 # ============================================================================
 # 目录与源文件收集
@@ -44,8 +44,9 @@ $(BUILD_DIR):
 # ============================================================================
 # 链接：生成可执行文件
 # ============================================================================
-$(TARGET): $(D_OBJECTS) $(C3_OBJECTS)
+$(TARGET): $(C3_OBJECTS) $(D_OBJECTS)
 	$(LINKER) $(LINK_FLAGS) $^ -of=$@ $(LINK_LIBS)
+	@strip $(TARGET)
 
 # ============================================================================
 # 编译 D 文件
@@ -57,7 +58,7 @@ $(BUILD_DIR)/%.d.o: $(D_SRC_DIR)/%.d
 # 编译 C3 文件
 # ============================================================================
 $(BUILD_DIR)/proc.o: $(C3_SOURCES)
-	$(C3C) compile-only --single-module=yes --no-entry -O2 -o $@ $^
+	$(C3C) compile-only --x86cpu=native --single-module=yes --no-entry -O3 -o $@ $^
 
 # ============================================================================
 # 安装目标
@@ -65,8 +66,8 @@ $(BUILD_DIR)/proc.o: $(C3_SOURCES)
 .PHONY: install
 install: $(TARGET)
 	@echo "安装到 $(INSTALL_BINDIR)"
-	install -d $(INSTALL_BINDIR)
-	install -m 755 $(TARGET) $(INSTALL_BINDIR)/
+	@install -d $(INSTALL_BINDIR)
+	@install -s -m 755 $(TARGET) $(INSTALL_BINDIR)/
 	@echo "安装完成。"
 # ============================================================================
 # 清理
