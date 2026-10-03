@@ -2,3 +2,4 @@ git-scan-dirs
 scripts
 *.o
 build
+**/lib/*
