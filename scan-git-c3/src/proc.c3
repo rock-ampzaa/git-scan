@@ -2,8 +2,10 @@ module proc;
 import std::io;
 import std::collections::list;
 import git;
+import git::repository;
+import git::branch;
 <*
- 引入libstring 中的函数 string_wide
+ 引入外部库 中的函数 string_wide
  @param input : "输入文字"
  @return "返回多少个文字的显示宽度"
 *>
@@ -71,28 +73,20 @@ fn void chk_status_change(Repo* repo, Report* rpt)
 		if (entry.status & status::Type.GIT_STATUS_WT_DELETED) {
 			// 该文件从worktree中删除了
 
-			rpt.push_message(
-				string::format(mem, "%s[%s]", pad_right("删除了文件", 80), entry.index_to_workdir.old_file.path)
-			);
+			rpt.push_message(string::format(mem, "%s[%s]", pad_right("删除了文件", 80), entry.index_to_workdir.old_file.path));
 		}
 		if (entry.status & status::Type.GIT_STATUS_INDEX_DELETED) {
 			// 该文件从index中删除了
 
-			rpt.push_message(
-				string::format(mem, "%s[%s]", pad_right("删除了文件", 80), entry.head_to_index.old_file.path)
-			);
+			rpt.push_message(string::format(mem, "%s[%s]", pad_right("删除了文件", 80), entry.head_to_index.old_file.path));
 		} else if (entry.status & status::Type.GIT_STATUS_WT_NEW) {
 			// 新建文件
 
-			rpt.push_message(
-				string::format(mem, "%s[%s]", pad_right("新建了文件", 80), entry.index_to_workdir.old_file.path)
-			);
+			rpt.push_message(string::format(mem, "%s[%s]", pad_right("新建了文件", 80), entry.index_to_workdir.old_file.path));
 		} else if (entry.status & status::Type.GIT_STATUS_INDEX_NEW) {
 			// 新建文件
 
-			rpt.push_message(
-				string::format(mem, "%s[%s]", pad_right("暂存了文件", 80), entry.head_to_index.old_file.path)
-			);
+			rpt.push_message(string::format(mem, "%s[%s]", pad_right("暂存了文件", 80), entry.head_to_index.old_file.path));
 		} else if (entry.status & status::Type.GIT_STATUS_WT_RENAMED) {
 			// 改名
 
@@ -120,15 +114,11 @@ fn void chk_status_change(Repo* repo, Report* rpt)
 		} else if (entry.status & GIT_STATUS_WT_MODIFIED) {
 			// 修改过
 
-			rpt.push_message(
-				string::format(mem, "%s[%s]", pad_right("修改了文件", 80), entry.index_to_workdir.old_file.path)
-			);
+			rpt.push_message(string::format(mem, "%s[%s]", pad_right("修改了文件", 80), entry.index_to_workdir.old_file.path));
 		} else if (entry.status & GIT_STATUS_INDEX_MODIFIED) {
 			// 修改过
 
-			rpt.push_message(
-				string::format(mem, "%s[%s]", pad_right("修改了文件", 80), entry.head_to_index.old_file.path)
-			);
+			rpt.push_message(string::format(mem, "%s[%s]", pad_right("修改了文件", 80), entry.head_to_index.old_file.path));
 		} else if (entry.status & GIT_STATUS_WT_TYPECHANGE) {
 			// TODO:类型变化
 		}
@@ -148,24 +138,24 @@ fn void chk_branch(BranchIterator* bi, Report* rpt)
 	bool has_upstream;
 	ZString name, name1;
 	Reference* b, upstream;
-	while (0 == git::branch_next(&b, &&git::BranchT.GIT_BRANCH_LOCAL, bi)) {
-		if (0 != git::branch_name(&name, b)) continue;
+	while (0 == git::branch::next(&b, &&git::branch::BranchT.GIT_BRANCH_LOCAL, bi)) {
+		if (0 != git::branch::name(&name, b)) continue;
 
-		if (0 == git::branch_upstream(&upstream, b)) {
+		if (0 == git::branch::upstream(&upstream, b)) {
 			if (!has_upstream) has_upstream = !has_upstream;
 
 
-			git::branch_name(&name1, upstream);
+			git::branch::name(&name1, upstream);
 			// 获取upstream oid, b oid
-			git::Object* this_obj, upstream_obj;
-			git::Oid* this_oid, upstream_oid;
-			if (0 == git::reference_peel(&this_obj, b, git::ObjectType.GIT_OBJECT_COMMIT)) {
-				this_oid = git::object_id(this_obj);
+			git::object::Object* this_obj, upstream_obj;
+			git::oid::Oid* this_oid, upstream_oid;
+			if (0 == git::reference::peel(&this_obj, b, git::object::ObjectType.GIT_OBJECT_COMMIT)) {
+				this_oid = git::object::id(this_obj);
 			}
-			if (0 == git::reference_peel(&upstream_obj, upstream, git::ObjectType.GIT_OBJECT_COMMIT)) {
-				upstream_oid = git::object_id(upstream_obj);
+			if (0 == reference::peel(&upstream_obj, upstream, git::object::ObjectType.GIT_OBJECT_COMMIT)) {
+				upstream_oid = git::object::id(upstream_obj);
 			}
-			if ((this_oid && upstream_oid) && 0 != git::oid_cmp(this_oid, upstream_oid)) {
+			if ((this_oid && upstream_oid) && 0 != git::oid::cmp(this_oid, upstream_oid)) {
 				rpt.push_message(
 					string::format(
 						mem,
@@ -177,11 +167,11 @@ fn void chk_branch(BranchIterator* bi, Report* rpt)
 			} else {
 				// io::printn("与上游相同"); // NOTE:实际不用处理
 			}
-			if (this_obj) git::object_free(this_obj);
-			if (upstream_obj) git::object_free(upstream_obj);
-			if (upstream) git::branch_free(upstream);
+			if (this_obj) git::object::free(this_obj);
+			if (upstream_obj) git::object::free(upstream_obj);
+			if (upstream) git::branch::free(upstream);
 		}
-		defer git::branch_free(b);
+		defer git::branch::free(b);
 	}
 	// 如果所有分支都没有上游分支，则要提示问题
 	if (!has_upstream) {
@@ -226,7 +216,7 @@ fn int proc(ZString path) @export
 	defer git::shutdown();
 
 	Repo* tmp;
-	if (0 != git::repository_open(&tmp, path)) {
+	if (0 != git::repository::open(&tmp, path)) {
 		GitError* e = git::error_last();
 		io::printfn(
 			"==========================================================================================================================================\n%s",
@@ -238,7 +228,7 @@ fn int proc(ZString path) @export
 	// io::printn();
 	defer {
 		// io::eprintn("defer repository");
-		git::repository_free(tmp);
+		git::repository::free(tmp);
 	}
 
 	// 进行仓库是否为空检查
@@ -248,20 +238,20 @@ fn int proc(ZString path) @export
 	//      	return 1;
 	//      }
 	// 进行仓库是否为裸仓库检查, 如果是裸仓库则跳过下面的所有检查
-	if (1 == git::repository_is_bare(tmp)) {
+	if (1 == repository::is_bare(tmp)) {
 		// 因为是裸仓库，不要检查
 		io::printn("裸仓库，不检查");
 		return 1;
 	}
 	BranchIterator* bi;
-	if (0 != git::branch_iterator_new(&bi, tmp, git::BranchT.GIT_BRANCH_LOCAL)) {
+	if (0 != branch::iterator_new(&bi, tmp, branch::BranchT.GIT_BRANCH_LOCAL)) {
 		// error process
 		io::eprintn("无法创建branch iterator");
 		return 1;
 	}
 	defer {
 		// io::eprintn("defer bi");
-		git::branch_iterator_free(bi);
+		branch::iterator_free(bi);
 	}
 
 	Report rpt = report_new();

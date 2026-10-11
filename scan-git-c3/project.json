@@ -6,7 +6,7 @@
   // Directories where C3 library files may be found.
   "dependency-search-paths": [ "lib" ],
   // Libraries to use for all targets.
-  "dependencies": [ ],
+  "dependencies": [ "c3git", ],
   "linked-libraries": ["git2", "rock-soo","icudata","icuuc"],
   // Authors, optionally with email.
   "authors": [ "rock, shenjun <rock_shenjun@163.com>" ],

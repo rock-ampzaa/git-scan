@@ -1,4 +1,4 @@
-PREFIX      ?=/local
+PREFIX      ?=${HOME}/local
 DESTDIR     ?=
 EXEC_PREFIX ?= $(PREFIX)
 BINDIR      ?= $(EXEC_PREFIX)/bin
@@ -19,7 +19,8 @@ LINK_LIBS    := -L-lgit2 -L-lrock-soo -L-licuuc # 链接 C3 运行时需要的�
 # 目录与源文件收集
 # ============================================================================
 D_SRC_DIR    := read-dir-list-d/src
-C3_SRC_DIR   := scan-git-c3/src
+C3_DIR       := scan-git-c3
+C3_SRC_DIR   := ${C3_DIR}/src
 BUILD_DIR    := build
 
 D_SOURCES    := $(wildcard $(D_SRC_DIR)/*.d)
@@ -58,7 +59,7 @@ $(BUILD_DIR)/%.d.o: $(D_SRC_DIR)/%.d
 # 编译 C3 文件
 # ============================================================================
 $(BUILD_DIR)/proc.o: $(C3_SOURCES)
-	$(C3C) compile-only --x86cpu=native --single-module=yes --no-entry -O3 -o $@ $^
+	$(C3C) compile-only --libdir $(C3_DIR)/lib --lib c3git --x86cpu=native --single-module=yes $(C3_FLAGS) -o $@ $^
 
 # ============================================================================
 # 安装目标
@@ -79,7 +80,8 @@ clean:
 .PHONY: help
 help:
 	@echo "可用目标:"
-	@echo "  all    - 构建项目 (默认)"
-	@echo "  clean  - 删除所有编译产物"
-	@echo "  help   - 显示此帮助信息"
+	@echo "  all     - 构建项目 (默认)"
+	@echo "  clean   - 删除所有编译产物"
+	@echo "  install - 安装到指定目录(需要 环境变量[PREFIX] 与 [DESTDIR]. ${INSTALL_BINDIR})"
+	@echo "  help    - 显示此帮助信息"
 
