@@ -7,14 +7,17 @@
 - `read-dir-list-d`负责接收命令行参数，解析'目录列表文件', 并调用`scan-git-c3`提供的`proc__proc`函数处理git部分
 - `scan-git-c3` `proc__proc`函数接收一个路径，对该路径中的文件是否 新建/删除/修改/改名、本地分支是否领先跟踪分支、整个仓库是否没有上游 等进行检查。并把检查到的问题显示在标准输出
 ## 构建方式
-在项目根目录下执行`make`, 即可生成`build/app`
+需要xmake及安装了c3lang扩展
 
-安装到指定目录:  
-**需要指定** DESTDIR 变量. 比如 `DESTDIR=~ make install`. 这样会将程序安装到用户主目录的`bin`中
+编译前需要定义`C3LIBRARY_PATH`环境变量. 并且需要在该路径中放置`libgit2.c3l` 这个c3 library
 
-如果要安装到`/usr/local/bin`中, 则执行 `DESTDIR=/usr/local make install`. 确保执行时有写入`/usr/local/bin`的权限
+在项目根目录下执行`xmake`, 即可生成`./build/linux/x86_64/release/scan-gitdir`
 
-**不可在不指定`DESTDIR`的情况下`make install`**
+## 安装
+**需要** PREFIX 环境变量. 该变量决定了安装位置
+
+在项目根目录下执行`xmake install`, 即可安装到`$PREFIX/bin`中. 应该确保可执行路径中包括该路径
+
 ## USAGE
 ```
 scan-git -f <目录列表文件>
