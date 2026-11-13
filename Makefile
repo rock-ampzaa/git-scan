@@ -8,12 +8,14 @@ DC          := ldc2
 DC_FLAGS    := -O2 -release
 DC_LIBS     := 
 
-C3C          := c3c
-C3_FLAGS     := -O2 --no-entry
+C3C          := c3c compile-only
+#C3_FLAGS     := --x86cpu=native -O2 --emit-stdlib=no -g0
+C3_FLAGS     := --x86cpu=native -Oz --function-sections=yes --data-sections=yes --single-module=yes
+#C3_FLAGS     := --x86cpu=native -O2 --function-sections=yes --data-sections=yes
 
 LINKER       := $(DC)  # 使用 D 链接器
-LINK_FLAGS   := -O2 -release
-LINK_LIBS    := -L-lgit2 -L-lrock-soo -L-licuuc # 链接 C3 运行时需要的库
+LINK_FLAGS   :=-O2 -release
+LINK_LIBS    := -L--gc-sections -L-lgit2 -L-lrock-soo -L-licuuc # 链接 C3 运行时需要的库
 
 # ============================================================================
 # 目录与源文件收集
@@ -28,7 +30,9 @@ D_SOURCES    := $(wildcard $(D_SRC_DIR)/*.d)
 C3_SOURCES   := $(filter-out $(C3_SRC_DIR)/main.c3,  $(shell find $(C3_SRC_DIR) -name "*.c3"))
 
 D_OBJECTS    := $(patsubst $(D_SRC_DIR)/%.d,$(BUILD_DIR)/%.d.o,$(D_SOURCES))
-C3_OBJECTS   := $(BUILD_DIR)/proc.o
+#C3_OBJECTS   := $(wildcard $(BUILD_DIR)/*.o)
+C3_OBJECTS   = $(BUILD_DIR)/proc.o
+
 
 # ============================================================================
 # 主目标
@@ -41,14 +45,6 @@ all: $(BUILD_DIR) $(TARGET)
 
 $(BUILD_DIR):
 	mkdir -p $@
-
-# ============================================================================
-# 链接：生成可执行文件
-# ============================================================================
-$(TARGET): $(C3_OBJECTS) $(D_OBJECTS)
-	$(LINKER) $(LINK_FLAGS) $^ -of=$@ $(LINK_LIBS)
-	@strip $(TARGET)
-
 # ============================================================================
 # 编译 D 文件
 # ============================================================================
@@ -58,8 +54,17 @@ $(BUILD_DIR)/%.d.o: $(D_SRC_DIR)/%.d
 # ============================================================================
 # 编译 C3 文件
 # ============================================================================
-$(BUILD_DIR)/proc.o: $(C3_SOURCES)
-	$(C3C) compile-only --libdir $(C3_DIR)/lib --lib c3git --x86cpu=native --single-module=yes $(C3_FLAGS) -o $@ $^
+$(C3_OBJECTS): $(C3_SOURCES)
+#$(C3C) compile-only --libdir $(C3_DIR)/lib --lib c3git $(C3_FLAGS) --obj-out $(BUILD_DIR) $<
+#$(C3C) compile-only --libdir $(C3_DIR)/lib --lib c3git $(C3_FLAGS) --single-module=yes -o $@ $<
+	$(C3C) --libdir $(C3_DIR)/lib --lib c3git $(C3_FLAGS) --obj-out $(BUILD_DIR) $^
+
+
+# ============================================================================
+# 链接：生成可执行文件
+# ============================================================================
+$(TARGET): $(C3_OBJECTS) $(D_OBJECTS)
+	$(LINKER) $(LINK_FLAGS) $^ -of=$@ $(LINK_LIBS)
 
 # ============================================================================
 # 安装目标
